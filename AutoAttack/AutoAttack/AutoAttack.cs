@@ -53,43 +53,32 @@ namespace AutoAttack
                 case 0:
                     //-1y from player pos
                     tileInFront = PlayerY - 1;
-
-                    Microsoft.Xna.Framework.Point p = new Microsoft.Xna.Framework.Point(Convert.ToInt32(PlayerX), Convert.ToInt32(tileInFront));
-
-                    foreach (Character c in gameLocation.characters)
-                        if (c.getTileLocationPoint() == p)
-                        {
-                            c.jumpWithoutSound();
-                            this.Monitor.Log($"{c.name}", LogLevel.Debug);
-                        }
-
                     break;
 
                 //  Player is facing right
                 case 1:
-                    //tileInFront = PlayerX + 1;
+                    tileInFront = PlayerX + 1;
                     break;
 
                 //  Player is facing down
                 case 2:
                     tileInFront = PlayerY + 1;
-
-                    p = new Microsoft.Xna.Framework.Point(Convert.ToInt32(PlayerX), Convert.ToInt32(tileInFront));
-
-                    foreach (Character c in gameLocation.characters)
-                        if (c.getTileLocationPoint() == p)
-                        {
-                            c.jumpWithoutSound();
-                            this.Monitor.Log($"{c.name} {c.IsMonster.ToString()}", LogLevel.Debug);
-                        }
                     break;
 
                 //  Player is facing left
                 case 3:
-                    //-1x from player pos
-                    //tileInFront = PlayerX - 1;
+                    tileInFront = PlayerX - 1;
                     break;
             }
+
+            Microsoft.Xna.Framework.Point p = new Microsoft.Xna.Framework.Point(Convert.ToInt32(PlayerX), Convert.ToInt32(tileInFront));
+
+            foreach (Character c in gameLocation.characters)
+                while ((c.getTileLocationPoint() == p) && c.IsMonster == true)
+                {
+                    c.jumpWithoutSound();
+                    this.Monitor.Log($"Attacking monster {c.name}", LogLevel.Debug);
+                }
         }
     }
 }
