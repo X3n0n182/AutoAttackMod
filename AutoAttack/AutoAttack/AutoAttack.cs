@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
+using StardewValley.Tools;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
@@ -40,7 +41,7 @@ namespace AutoAttack
             double PlayerDirection = Game1.player.FacingDirection;
 
             GameLocation gameLocation = Game1.player.currentLocation;
-            Tool tool;
+            
 
             double tileInFront = 0;
 
@@ -86,10 +87,13 @@ namespace AutoAttack
                 //  NPC position
                 Point p2 = new Point(npcX, npcY);
 
-                if (p == p2 && Game1.player.IsEquippedItem(tool. ))
+                Tool playerTool = Game1.player.CurrentTool;
+
+                if ((p == p2) && (playerTool is MeleeWeapon) && (c.IsMonster == true))
                 {
-                    Game1.player.
+                    playerTool.leftClick(Game1.player);
                     this.Monitor.Log($"{c.name} is in front of you.", LogLevel.Debug);
+                    playerTool.resetState();
                 }
             }                
         }
