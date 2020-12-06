@@ -1,0 +1,6 @@
+C:\Users\Harold Mandal\Desktop\AutoAttackMod\AutoAttack\AutoAttack\bin\Debug\AutoAttack.dll
+C:\Users\Harold Mandal\Desktop\AutoAttackMod\AutoAttack\AutoAttack\bin\Debug\AutoAttack.pdb
+C:\Users\Harold Mandal\Desktop\AutoAttackMod\AutoAttack\AutoAttack\obj\Debug\AutoAttack.csprojAssemblyReference.cache
+C:\Users\Harold Mandal\Desktop\AutoAttackMod\AutoAttack\AutoAttack\obj\Debug\AutoAttack.csproj.CoreCompileInputs.cache
+C:\Users\Harold Mandal\Desktop\AutoAttackMod\AutoAttack\AutoAttack\obj\Debug\AutoAttack.dll
+C:\Users\Harold Mandal\Desktop\AutoAttackMod\AutoAttack\AutoAttack\obj\Debug\AutoAttack.pdb

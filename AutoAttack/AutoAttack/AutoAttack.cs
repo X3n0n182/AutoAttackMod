@@ -5,6 +5,7 @@ using StardewValley.Tools;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using System.Collections.Generic;
 
 namespace AutoAttack
 {
@@ -40,10 +41,7 @@ namespace AutoAttack
 
             double PlayerDirection = Game1.player.FacingDirection;
 
-            GameLocation gameLocation = Game1.player.currentLocation;
-            
-
-            double tileInFront = 0;
+            GameLocation gameLocation = Game1.player.currentLocation;               
 
             // facing up = 0, right = 1, down = 2, left = 3
 
@@ -75,25 +73,32 @@ namespace AutoAttack
                     PlayerX = PlayerX - 1;
                     break;
             }
-           
+
             foreach (Character c in gameLocation.characters)
             {
-                int npcX = Convert.ToInt32(Math.Floor(c.Position.X / Game1.tileSize));
-                int npcY = Convert.ToInt32(Math.Floor(c.Position.Y / Game1.tileSize));
+                List<Point> farmerPoints = new List<Point>();
+                farmerPoints.Clear();
 
-                //  Farmer position +1 tile whatever direction they're facing
-                Point p = new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY));
+                farmerPoints.Add(new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY)));    // Front tile
+                farmerPoints.Add(new Point((farmerPoints[0].X - 1), farmerPoints[0].Y));            // Front left tile
+                farmerPoints.Add(new Point((farmerPoints[0].X + 1), farmerPoints[0].Y));            // Front right tile
+                farmerPoints.Add(new Point((farmerPoints[0].X - 1), farmerPoints[0].Y - 1));        // Left tile
+                farmerPoints.Add(new Point((farmerPoints[0].X + 1), farmerPoints[0].Y - 1));        // Right tile
 
                 //  NPC position
-                Point p2 = new Point(npcX, npcY);
-
+                int npcX = Convert.ToInt32(Math.Floor(c.Position.X / Game1.tileSize));
+                int npcY = Convert.ToInt32(Math.Floor(c.Position.Y / Game1.tileSize));               
+                Point npcPos = new Point(npcX, npcY);
+                             
                 Tool playerTool = Game1.player.CurrentTool;
-
-                if ((p == p2) && (playerTool is MeleeWeapon) && (c.IsMonster == true))
+                
+                foreach (Point p in farmerPoints)
                 {
-                    playerTool.leftClick(Game1.player);
-                    this.Monitor.Log($"{c.name} is in front of you.", LogLevel.Debug);
-                    playerTool.resetState();
+                    if ((p == npcPos) && (playerTool is MeleeWeapon) && (c.IsMonster == true))
+                    {
+                        playerTool.leftClick(Game1.player);
+                        playerTool.resetState();
+                    }
                 }
             }                
         }
