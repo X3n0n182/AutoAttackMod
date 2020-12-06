@@ -41,14 +41,12 @@ namespace AutoAttack
 
             double PlayerDirection = Game1.player.FacingDirection;
 
-            GameLocation gameLocation = Game1.player.currentLocation;               
+            GameLocation gameLocation = Game1.player.currentLocation;
 
-            // facing up = 0, right = 1, down = 2, left = 3
+            List<Point> farmerPoints = new List<Point>();
+            farmerPoints.Clear();
 
-            this.Monitor.Log($"X: {PlayerX} Y: {PlayerY}, Facing: {PlayerDirection}", LogLevel.Debug);
-
-            //this.Monitor.Log($"X: {Math.Floor(Game1.player.Position.X / Game1.tileSize)} Y: {Math.Floor(Game1.player.Position.Y / Game1.tileSize)}. Facing: {Game1.player.FacingDirection}", LogLevel.Debug);
-            //this.Monitor.Log($"Location X: {Game1.player.getTileX() * Game1.tileSize} Y: {Game1.player.getTileY() * Game1.tileSize}.", LogLevel.Debug);
+            //this.Monitor.Log($"X: {PlayerX} Y: {PlayerY}, Facing: {PlayerDirection}", LogLevel.Debug);
 
             switch (PlayerDirection)
             {
@@ -56,35 +54,50 @@ namespace AutoAttack
                 case 0:
                     //-1y from player pos
                     PlayerY = PlayerY - 1;
+
+                    farmerPoints.Add(new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY)));    //  Front
+                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), farmerPoints[0].Y));            //  Front left
+                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), farmerPoints[0].Y));            //  Front right
+                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), (farmerPoints[0].Y + 1)));      //  True left
+                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), (farmerPoints[0].Y + 1)));      //  True right
                     break;
 
                 //  Player is facing right
                 case 1:
                     PlayerX = PlayerX + 1;
+
+                    farmerPoints.Add(new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY)));
+                    farmerPoints.Add(new Point(farmerPoints[0].X, (farmerPoints[0].Y - 1)));
+                    farmerPoints.Add(new Point(farmerPoints[0].X, (farmerPoints[0].Y + 1)));
+                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), (farmerPoints[0].Y - 1)));
+                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), (farmerPoints[0].Y + 1)));
                     break;
 
                 //  Player is facing down
                 case 2:
                     PlayerY = PlayerY + 1;
+
+                    farmerPoints.Add(new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY)));
+                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), farmerPoints[0].Y));
+                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), farmerPoints[0].Y));
+                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), (farmerPoints[0].Y - 1)));
+                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), (farmerPoints[0].Y - 1)));
                     break;
 
                 //  Player is facing left
                 case 3:
                     PlayerX = PlayerX - 1;
+
+                    farmerPoints.Add(new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY)));
+                    farmerPoints.Add(new Point(farmerPoints[0].X, (farmerPoints[0].Y - 1)));
+                    farmerPoints.Add(new Point(farmerPoints[0].X, (farmerPoints[0].Y + 1)));
+                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), (farmerPoints[0].Y - 1)));
+                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), (farmerPoints[0].Y + 1)));
                     break;
             }
 
             foreach (Character c in gameLocation.characters)
-            {
-                List<Point> farmerPoints = new List<Point>();
-                farmerPoints.Clear();
-
-                farmerPoints.Add(new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY)));    // Front tile
-                farmerPoints.Add(new Point((farmerPoints[0].X - 1), farmerPoints[0].Y));            // Front left tile
-                farmerPoints.Add(new Point((farmerPoints[0].X + 1), farmerPoints[0].Y));            // Front right tile
-                farmerPoints.Add(new Point((farmerPoints[0].X - 1), farmerPoints[0].Y - 1));        // Left tile
-                farmerPoints.Add(new Point((farmerPoints[0].X + 1), farmerPoints[0].Y - 1));        // Right tile
-
+            {              
                 //  NPC position
                 int npcX = Convert.ToInt32(Math.Floor(c.Position.X / Game1.tileSize));
                 int npcY = Convert.ToInt32(Math.Floor(c.Position.Y / Game1.tileSize));               
