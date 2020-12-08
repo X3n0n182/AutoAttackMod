@@ -14,7 +14,6 @@ namespace AutoAttack
         public override void Entry(IModHelper helper)
         {
             helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
-            //helper.Events.Input.ButtonPressed += this.OnButtonPressed;
         }
 
         private void OnUpdateTicked(object sender, EventArgs e)
@@ -32,36 +31,60 @@ namespace AutoAttack
 
             if (c.IsMonster == true && c != player && playerTool is MeleeWeapon)
             {
-                if (c.getTileLocation() == player.getTileLocation())
-                {
-                    MeleeWeapon mw = new MeleeWeapon();
-                    mw.triggerDefenseSwordFunction(player);
+                int direction = player.getGeneralDirectionTowards(c.Position);
 
-                }
-                else
+                // We moved towards the target; we don't need to do anything
+                if (player.FacingDirection == direction) return;
+
+                playerTool.leftClick(player);
+
+                // We moved away from the target; make farmer face the right way again
+                player.FacingDirection = direction;
+
+                // Set run animation to be heading towards the target; does not support walking yet...
+                switch (direction)
                 {
-                    player.FacingDirection = player.getGeneralDirectionTowards(c.Position);
-                    playerTool.leftClick(player);
+                    case 0:
+                        player.FarmerSprite.animate(48, new GameTime());
+                        break;
+                    case 1:
+                        player.FarmerSprite.animate(40, new GameTime());
+                        break;
+                    case 2:
+                        player.FarmerSprite.animate(32, new GameTime());
+                        break;
+                    case 3:
+                        player.FarmerSprite.animate(56, new GameTime());
+                        break;
                 }
-                
+               
+                return;
             }
 
-            c = null;
+
+            
         }
-
-        //private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
-        //{
-        //    // ignore if player hasn't loaded a save yet
-        //    if (!Context.IsWorldReady)
-        //        return;
-
-        //    // print button presses to the console window
-        //    this.Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
-
-        //}
 
         private void unusedCode()
         {
+            //if (c.IsMonster == true && c != player && playerTool is MeleeWeapon)
+            //{
+            //    if (c.getTileLocation() == player.getTileLocation())
+            //    {
+            //        MeleeWeapon mw = new MeleeWeapon();
+            //        mw.triggerDefenseSwordFunction(player);
+
+            //    }
+            //    else
+            //    {
+            //        player.FacingDirection = player.getGeneralDirectionTowards(c.Position);
+            //        playerTool.leftClick(player);
+            //    }
+
+            //}
+
+            //c = null;
+
             //List<Vector2> tileRange = new List<Vector2>();
             //
             //switch (player.getFacingDirection())
