@@ -11,109 +11,79 @@ namespace AutoAttack
 {
     public class AutoAttack : Mod
     {
-
-        /*********
-        ** Public methods
-        *********/
-        /// <summary>The mod entry point, called after the mod is first loaded.</summary>
-        /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper)
         {
-            helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;           
+            helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
+            //helper.Events.Input.ButtonPressed += this.OnButtonPressed;
         }
 
-        /*********
-        ** Private methods
-        *********/
-        /// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event data.</param>
         private void OnUpdateTicked(object sender, EventArgs e)
         {
             // ignore if player hasn't loaded a save yet
             if (!Context.IsWorldReady)
                 return;
 
-            // tile poisition in the current level
+            Farmer player = Game1.player;
+            Tool playerTool = Game1.player.CurrentTool;     
+            GameLocation playerLocation = Game1.player.currentLocation;
+            List<Vector2> tileRange = new List<Vector2>();
 
-            double PlayerX = Math.Floor(Game1.player.Position.X / Game1.tileSize);
-            double PlayerY = Math.Floor(Game1.player.Position.Y / Game1.tileSize);
-
-            double PlayerDirection = Game1.player.FacingDirection;
-
-            GameLocation gameLocation = Game1.player.currentLocation;
-
-            List<Point> farmerPoints = new List<Point>();
-            farmerPoints.Clear();
-
-            //this.Monitor.Log($"X: {PlayerX} Y: {PlayerY}, Facing: {PlayerDirection}", LogLevel.Debug);
-
-            switch (PlayerDirection)
+            switch (player.getFacingDirection())
             {
-                //  Player is facing up
+                // up right down left
                 case 0:
-                    //-1y from player pos
-                    PlayerY = PlayerY - 1;
-
-                    farmerPoints.Add(new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY)));    //  Front
-                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), farmerPoints[0].Y));            //  Front left
-                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), farmerPoints[0].Y));            //  Front right
-                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), (farmerPoints[0].Y + 1)));      //  True left
-                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), (farmerPoints[0].Y + 1)));      //  True right
+                    tileRange.Add(new Vector2(player.getTileX(), player.getTileY() - 1));           // 🟩 🟩 🟩
+                    tileRange.Add(new Vector2(player.getTileX(), player.getTileY() - 2));           // 🟩 🟩 🟩
+                    tileRange.Add(new Vector2(player.getTileX() - 1, player.getTileY() - 1));       //   O
+                    tileRange.Add(new Vector2(player.getTileX() + 1, player.getTileY() - 1));
+                    tileRange.Add(new Vector2(player.getTileX() - 1, player.getTileY() - 2));
+                    tileRange.Add(new Vector2(player.getTileX() + 1, player.getTileY() - 2));
                     break;
-
-                //  Player is facing right
                 case 1:
-                    PlayerX = PlayerX + 1;
-
-                    farmerPoints.Add(new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY)));
-                    farmerPoints.Add(new Point(farmerPoints[0].X, (farmerPoints[0].Y - 1)));
-                    farmerPoints.Add(new Point(farmerPoints[0].X, (farmerPoints[0].Y + 1)));
-                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), (farmerPoints[0].Y - 1)));
-                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), (farmerPoints[0].Y + 1)));
+                    tileRange.Add(new Vector2(player.getTileX() + 1, player.getTileY()));
+                    tileRange.Add(new Vector2(player.getTileX() + 1, player.getTileY() - 1));       //   🟩 🟩
+                    tileRange.Add(new Vector2(player.getTileX() + 1, player.getTileY() + 1));       // O 🟩 🟩
+                    tileRange.Add(new Vector2(player.getTileX() + 2, player.getTileY()));           //   🟩 🟩
+                    tileRange.Add(new Vector2(player.getTileX() + 2, player.getTileY() - 1));
+                    tileRange.Add(new Vector2(player.getTileX() + 2, player.getTileY() + 1));       
                     break;
-
-                //  Player is facing down
                 case 2:
-                    PlayerY = PlayerY + 1;
-
-                    farmerPoints.Add(new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY)));
-                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), farmerPoints[0].Y));
-                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), farmerPoints[0].Y));
-                    farmerPoints.Add(new Point((farmerPoints[0].X - 1), (farmerPoints[0].Y - 1)));
-                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), (farmerPoints[0].Y - 1)));
+                    tileRange.Add(new Vector2(player.getTileX(), player.getTileY() + 1));           //   O
+                    tileRange.Add(new Vector2(player.getTileX() - 1, player.getTileY() + 1));       // 🟩 🟩 🟩
+                    tileRange.Add(new Vector2(player.getTileX() + 1, player.getTileY() + 1));       // 🟩 🟩 🟩
+                    tileRange.Add(new Vector2(player.getTileX(), player.getTileY() - 2));
+                    tileRange.Add(new Vector2(player.getTileX() - 1, player.getTileY() - 2));
+                    tileRange.Add(new Vector2(player.getTileX() + 1, player.getTileY() - 2));
                     break;
-
-                //  Player is facing left
                 case 3:
-                    PlayerX = PlayerX - 1;
-
-                    farmerPoints.Add(new Point(Convert.ToInt32(PlayerX), Convert.ToInt32(PlayerY)));
-                    farmerPoints.Add(new Point(farmerPoints[0].X, (farmerPoints[0].Y - 1)));
-                    farmerPoints.Add(new Point(farmerPoints[0].X, (farmerPoints[0].Y + 1)));
-                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), (farmerPoints[0].Y - 1)));
-                    farmerPoints.Add(new Point((farmerPoints[0].X + 1), (farmerPoints[0].Y + 1)));
+                    tileRange.Add(new Vector2(player.getTileX() - 1, player.getTileY()));           // 🟩 🟩
+                    tileRange.Add(new Vector2(player.getTileX() - 1, player.getTileY() - 1));       // 🟩 🟩 O
+                    tileRange.Add(new Vector2(player.getTileX() - 1, player.getTileY() + 1));       // 🟩 🟩
+                    tileRange.Add(new Vector2(player.getTileX() - 2, player.getTileY()));
+                    tileRange.Add(new Vector2(player.getTileX() - 2, player.getTileY() - 1));
+                    tileRange.Add(new Vector2(player.getTileX() - 2, player.getTileY() + 1));
                     break;
             }
 
-            foreach (Character c in gameLocation.characters)
-            {              
-                //  NPC position
-                int npcX = Convert.ToInt32(Math.Floor(c.Position.X / Game1.tileSize));
-                int npcY = Convert.ToInt32(Math.Floor(c.Position.Y / Game1.tileSize));               
-                Point npcPos = new Point(npcX, npcY);
-                             
-                Tool playerTool = Game1.player.CurrentTool;
-                
-                foreach (Point p in farmerPoints)
+            foreach (Character c in playerLocation.characters)
+            {
+                if (c.IsMonster == false && c != player && c.name == "Keeper")
                 {
-                    if ((p == npcPos) && (playerTool is MeleeWeapon) && (c.IsMonster == true))
-                    {
-                        playerTool.leftClick(Game1.player);
-                        playerTool.resetState();
-                    }
+                    player.faceDirection(player.getGeneralDirectionTowards(c.getTileLocation()));
+                    //player.FacingDirection = player.getGeneralDirectionTowards(c.getTileLocation());
                 }
-            }                
+            }
         }
+
+        //private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+        //{
+        //    // ignore if player hasn't loaded a save yet
+        //    if (!Context.IsWorldReady)
+        //        return;
+
+        //    // print button presses to the console window
+        //    this.Monitor.Log($"{Game1.player.Name} pressed {e.Button}.", LogLevel.Debug);
+            
+        //}
     }
 }
