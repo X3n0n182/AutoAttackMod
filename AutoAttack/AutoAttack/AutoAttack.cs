@@ -13,7 +13,29 @@ namespace AutoAttack
     {
         public override void Entry(IModHelper helper)
         {
+            //helper.Events.Input.ButtonPressed += new EventHandler<ButtonPressedEventArgs>(this.ButtonPressed);
             helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
+        }
+
+        private void ButtonPressed(object sender, ButtonPressedEventArgs e)
+        {
+            SButton[] walkBtns = new SButton[4];
+            
+            if (walkBtns is null)
+            {
+                walkBtns[0] = SButton.W;
+                walkBtns[1] = SButton.A;
+                walkBtns[2] = SButton.S;
+                walkBtns[3] = SButton.D;
+            }
+
+            foreach (SButton sb in walkBtns)
+            {
+                if (sb != e.Button)
+                {
+                    Helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
+                }
+            }
         }
 
         private void OnUpdateTicked(object sender, EventArgs e)
@@ -25,19 +47,19 @@ namespace AutoAttack
             Tool playerTool = Game1.player.CurrentTool;     
             GameLocation playerLocation = Game1.player.currentLocation;
 
-            const int TILERANGE = 2;
+            const int TILERANGE = 3;
                   
             Character c = Utility.isThereAFarmerOrCharacterWithinDistance(player.getTileLocation(), TILERANGE, playerLocation);
 
+            //if (c.IsMonster == true && c != player && playerTool is MeleeWeapon)
+            //if (c.name == "Abigail" &&c != player && playerTool is MeleeWeapon)
             if (c.IsMonster == true && c != player && playerTool is MeleeWeapon)
             {
                 int direction = player.getGeneralDirectionTowards(c.Position);
 
                 // We moved towards the target; we don't need to do anything
                 if (player.FacingDirection == direction) return;
-
-                playerTool.leftClick(player);
-
+               
                 // We moved away from the target; make farmer face the right way again
                 player.FacingDirection = direction;
 
@@ -57,12 +79,14 @@ namespace AutoAttack
                         player.FarmerSprite.animate(56, new GameTime());
                         break;
                 }
-               
+
+                playerTool.beginUsing(playerLocation, (int)player.GetToolLocation(true).X, (int)player.GetToolLocation(true).Y, player);
+
+                //MeleeWeapon mw = (MeleeWeapon)playerTool;
+                //mw.doSwipe(Convert.ToInt32(mw.GetType()), player.GetToolLocation(true), direction, mw.speed, player);
+                //playerTool.leftClick(player);
                 return;
-            }
-
-
-            
+            }           
         }
 
         private void unusedCode()
